@@ -1,14 +1,16 @@
 <template>
   <div id="app">
-    <UserListing />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import UserListing from "./components/UserListing.vue";
+import UserDetails from "./components/UserDetails.vue";
 
 const components = {
   UserListing,
+  UserDetails
 };
 
 export default {
@@ -22,7 +24,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   padding: 10px 50px;
-  
+
   @media (min-width: 1068px) {
     padding: 96px 348px;
   }
