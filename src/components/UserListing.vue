@@ -7,19 +7,13 @@
             </div>
             <form v-if="formVisible" @submit.prevent="addUser">
                 <div>
-                    <label for="user-name">
-                        Nome do usuário
-                    </label>
+                    <label for="user-name">Nome do usuário</label>
                     <input required v-model="newUser.name" name="user-name" type="text" />
                 </div>
                 <div>
-                    <label for="user-function">
-                        Função do usuário
-                    </label>
+                    <label for="user-function">Função do usuário</label>
                     <button class="user-function" @click.prevent="toggleListVisibility">
-                        <span style="color: var(--normal-text)">
-                            {{ listButtonText }}
-                        </span>
+                        <span style="color: var(--normal-text)">{{ listButtonText }}</span>
                         <ArrowIcon />
                     </button>
                     <ul v-show="isListVisible">
@@ -29,9 +23,7 @@
                         <li @click="handleListItemClick('UI/UX Designer')">UI/UX Designer</li>
                     </ul>
                 </div>
-                <button class="action-btn" type="submit">
-                    Salvar dados do usuário
-                </button>
+                <button class="action-btn" type="submit">Salvar dados do usuário</button>
             </form>
         </div>
         <ul class="user-listing">
@@ -42,8 +34,7 @@
                             <template v-if="user.avatar">
                                 <img :src="user.avatar" alt="User Image" @error="handleImageError(user)">
                             </template>
-                            <div v-else class="image-placeholder">
-                            </div>
+                            <div v-else class="image-placeholder"></div>
                         </div>
                         <div class="user-data">
                             <span>#{{ user.id }}</span>
@@ -53,13 +44,17 @@
                     </div>
                     <div class="user-options">
                         <button>
-                            <EditIcon />
+                            <router-link :to="{ name: 'user-details', query: { id: user.id } }">
+                                <EditIcon />
+                            </router-link>
                         </button>
-                        <button>
+                        <button class="delete-user" @click="deleteUser(user.id)">
                             <DeleteIcon />
                         </button>
                         <button>
-                            <ViewIcon />
+                            <router-link :to="{ name: 'user-details', query: { id: user.id } }">
+                                <ViewIcon />
+                            </router-link>
                         </button>
                     </div>
                 </div>
@@ -74,16 +69,14 @@ import DeleteIcon from "@/icons/DeleteIcon.vue";
 import ViewIcon from "@/icons/ViewIcon.vue";
 import ArrowIcon from "@/icons/ArrowIcon.vue";
 
-const components = {
-    EditIcon,
-    DeleteIcon,
-    ViewIcon,
-    ArrowIcon
-}
-
 export default {
     name: "UserListing",
-    components,
+    components: {
+        EditIcon,
+        DeleteIcon,
+        ViewIcon,
+        ArrowIcon
+    },
     data() {
         return {
             users: [],
@@ -94,33 +87,28 @@ export default {
             formVisible: false,
             isListVisible: false,
             listButtonText: "Selecione a função"
-        }
+        };
     },
     computed: {
         buttonText() {
-            return this.formVisible ? "Cancelar" : "Novo usuário"
+            return this.formVisible ? "Cancelar" : "Novo usuário";
         },
         isButtonActive() {
-            return this.formVisible ? "action-btn active" : "action-btn"
+            return this.formVisible ? "action-btn active" : "action-btn";
         }
     },
     methods: {
         toggleListVisibility() {
-            if (this.isListVisible) {
-                this.isListVisible = false
-            } else {
-                this.isListVisible = true
-            }
+            this.isListVisible = !this.isListVisible;
         },
         toggleForm() {
-            if (this.formVisible) {
-                this.formVisible = false;
-            } else {
-                this.formVisible = true;
-            }
+            this.formVisible = !this.formVisible;
         },
         resetForm() {
-            this.newUser = { name: '', job: '' };
+            this.newUser = {
+                name: '',
+                job: ''
+            };
         },
         handleOutsideClick(event) {
             if (!this.$el.contains(event.target)) {
@@ -155,18 +143,38 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     if (!data.id) data.id = newId;
-                    this.users.push(data); // Adiciona o usuário retornado ao array local
-                    this.toggleForm(); // Opcional: fecha o formulário após o sucesso
+                    this.users.push(data);
+                    this.toggleForm();
                     console.log('Usuário adicionado:', data);
                 })
                 .catch(error => {
                     console.error('Erro ao adicionar usuário:', error);
                 })
-                .finally(
-                    () => {
-                        this.resetForm();
-                    }
-                )
+                .finally(() => {
+                    this.resetForm();
+                });
+        },
+        deleteUser(userId) {
+            // Filtra a lista de usuários para remover o usuário com o ID fornecido
+            this.users = this.users.filter(user => user.id !== userId);
+            
+            // Se necessário, faça uma requisição à API para deletar o usuário
+            fetch(`https://reqres.in/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Usuário com ID ${userId} deletado com sucesso.`);
+                } else {
+                    console.error(`Erro ao deletar usuário com ID ${userId}.`);
+                }
+            })
+            .catch(error => {
+                console.error(`Erro ao deletar usuário com ID ${userId}:`, error);
+            });
         }
     },
     mounted() {
@@ -209,8 +217,13 @@ export default {
 
 .user-main>.user-header {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+    }
 }
 
 .user-main>.user-header>h1 {
@@ -311,8 +324,15 @@ export default {
 
 .user-listing>li>.user-wrapper {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     width: 100%;
+    gap: 10px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        gap: 0;
+    }
 }
 
 .user-listing>li>.user-wrapper>.user-info {
@@ -340,10 +360,16 @@ export default {
 }
 
 .user-listing>li>.user-wrapper>.user-info>.user-data>span {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.5px;
     color: var(--normal-text);
 }
 
 .user-listing>li>.user-wrapper>.user-info>.user-data>strong {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 21.94px;
     margin-top: 10px;
     margin-bottom: 3px;
 }
