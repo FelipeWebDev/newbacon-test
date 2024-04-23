@@ -44,7 +44,7 @@
                     </div>
                     <div class="user-options">
                         <button>
-                            <router-link :to="{ name: 'user-details', query: { id: user.id } }">
+                            <router-link :to="{ name: 'users', params: { id: user.id } }">
                                 <EditIcon />
                             </router-link>
                         </button>
@@ -52,7 +52,7 @@
                             <DeleteIcon />
                         </button>
                         <button>
-                            <router-link :to="{ name: 'user-details', query: { id: user.id } }">
+                            <router-link :to="{ name: 'users', params: { id: user.id } }">
                                 <ViewIcon />
                             </router-link>
                         </button>

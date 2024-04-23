@@ -96,8 +96,8 @@ export default {
     },
     methods: {
         getUserIdFromUrl() {
-            if (this.$route && this.$route.query && this.$route.query.id) {
-                const originalUserId = parseInt(this.$route.query.id);
+            if (this.$route && this.$route.params && this.$route.params.id) {
+                const originalUserId = parseInt(this.$route.params.id); // Use `params` em vez de `query`
                 this.userId = originalUserId + 0;
             }
         },

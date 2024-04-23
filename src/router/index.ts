@@ -15,8 +15,8 @@ const router = new VueRouter({
       component: UserListing
     },
     {
-      path: '/user-details',
-      name: "user-details",
+      path: '/users/:id',
+      name: "users",
       component: UserDetails
     }
   ]
